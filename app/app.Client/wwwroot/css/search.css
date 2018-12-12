@@ -1,0 +1,13 @@
+.search-controls input {
+    font-size: 2rem;
+    height: 4rem;
+}
+
+.search-controls .search-buttons>button {
+    margin: 0;
+    width: 50%;
+}
+
+.search-next button {
+    width: 100%;
+}

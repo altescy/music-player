@@ -1,0 +1,108 @@
+@using app.Shared.Models
+@using System.Collections.Generic
+@using System.Threading.Tasks
+
+<div class='player-container'>
+    <div id='player'></div>
+    <div class='player-controls'>
+        <div class='player-controls-buttons'>
+            <div class="queue-prev">
+                <span class="glyphicon glyphicon-step-backward"></span>
+            </div>
+            <div class="player-toggle player-is-paused">
+                <span class="glyphicon"></span>
+            </div>
+            <div class="queue-next">
+                <span class="glyphicon glyphicon-step-forward"></span>
+            </div>
+        </div>
+        <div class="row" style="margin: 16px 0;">
+            <div class='player-timeline col-md-2'>
+                <span class='player-timepassed'></span>
+            </div>
+            <div class="col-md-8">
+                <div class='player-controls-seekbar col-md-8'>
+                    <input class='player-seekbar slider' type='range' />
+                </div>
+
+            </div>
+            <div class='player-timeline col-md-2'>
+                <span class='player-duration'></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr style="margin: 16px" />
+
+<div class='player-controls'>
+    <button class="queue-toggle-loop btn" title="loop"><span class="glyphicon glyphicon-repeat"></span></button>
+    <button class="btn" onclick="@ClearQueue" title="clear queue"><span class="glyphicon glyphicon-minus"></span></button>
+</div>
+
+<div class="queue">
+    <TrackList tracks=@Queue />
+</div>
+
+<div class="loading-blind"></div>
+
+
+@functions {
+    static BlazorComponent PageObject;
+    static List<Track> Queue = new List<Track>();
+    bool IsInitiaized = false;
+
+    protected override void OnInit()
+    {
+        PageObject = this;
+    }
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        if(!IsInitiaized)
+        {
+            IsInitiaized = await PlayerController.Setup();
+        }
+    }
+
+    public static BlazorComponent GetPageObject()
+    {
+        return PageObject;
+    }
+
+    public void Update()
+    {
+        this.StateHasChanged();
+    }
+
+    public static Task Load(Track track)
+    {
+        Queue.ForEach(t => t.NowPlaying = false);
+        track.NowPlaying = true;
+        ((Shared.Player)PageObject).Update();
+        return PlayerController.Load(track);
+    }
+
+    public static void AddToQueue(Track track)
+    {
+        Queue.Add(track);
+        ((Shared.Player)PageObject).Update();
+    }
+
+    public static void AddToQueue(List<Track> tracks)
+    {
+        Queue.AddRange(tracks);
+        ((Shared.Player)PageObject).Update();
+    }
+
+    public static void DeleteFromQueue(Track track)
+    {
+        Queue.Remove(track);
+        ((Shared.Player)PageObject).Update();
+    }
+
+    public static void ClearQueue()
+    {
+        Queue.Clear();
+    }
+}

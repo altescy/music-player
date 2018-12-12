@@ -1,0 +1,80 @@
+@page "/playlists"
+@using app.Client.Utilities
+@using app.Shared.Models
+@inject HttpClient Http
+
+<h1>Playlists</h1>
+
+<div class='playlist-list'>
+    <ul>
+        @if(PlaylistList == null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            @foreach (var playlist in PlaylistList)
+            {
+                <li>
+                    <div class='playlist-container'>
+                        <h4 class='playlist-name' onclick='@(() => LoadTracks(playlist))'><span class="glyphicon glyphicon-th-list"></span> @playlist.Name</h4>
+                        <button class="add-to-queue btn" title="add to queue" onclick="@(() => AddToQueue(playlist))"><span class="glyphicon glyphicon-plus"></span></button>
+                        <div class='playlist-tracks'>
+                            @if(playlist.Tracks != null)
+                            {
+                                <TrackList tracks=@playlist.Tracks playlist=@playlist />
+                            }
+                        </div>
+                    </div>
+                </li>
+            }
+        }
+    </ul>
+</div>
+
+
+@functions {
+    static List<Playlist> PlaylistList;
+    static BlazorComponent PageObject;
+
+    protected override void OnInit()
+    {
+        PageObject = this;
+    }
+
+    public static BlazorComponent GetPageObject()
+    {
+        return PageObject;
+    }
+
+    public void Update()
+    {
+        this.StateHasChanged();
+    }
+
+    public static void UpdateState()
+    {
+        ((Pages.Playlists)PageObject).Update();
+    }
+
+    protected override async Task OnInitAsync()
+    {
+        PlaylistList = await Http.GetJsonAsync<List<Playlist>>("api/Playlist/GetPlaylists");
+    }
+
+    public async Task LoadTracks(Playlist playlist)
+    {
+        playlist.Tracks = await Http.GetJsonAsync<List<Track>>($"api/Playlist/GetTracks?token={playlist.Token}");
+        this.StateHasChanged();
+    }
+
+    public async Task AddToQueue(Playlist playlist)
+    {
+        var tracks = playlist.Tracks;
+        if(tracks == null)
+        {
+            tracks = await Http.GetJsonAsync<List<Track>>($"api/Playlist/GetTracks?token={playlist.Token}");
+        }
+        Shared.Player.AddToQueue(tracks);
+    }
+}

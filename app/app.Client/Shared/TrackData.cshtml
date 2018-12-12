@@ -1,0 +1,118 @@
+@using app.Client.Utilities
+@using app.Shared.Models
+@inject HttpClient Http
+
+@if(!isHidden)
+{
+    <div class='track-container @(track.NowPlaying? "now-playing":null)'>
+        <div class="thumbnail" onclick="@Load">
+            <img src="@track.ThumbnailSmall" alt="" />
+        </div>
+        <div class="track-info">
+            <h4 class="track-title" onclick="@Load">@track.Title</h4>
+            <div class="track-meta">
+                <span class="account-name">@track.AccountName</span>
+                <span class="playback-count"><span class="glyphicon glyphicon-play"></span>@track.PlaybackCount</span>
+                <span class="likes-count"><span class="glyphicon glyphicon-heart"></span>@track.LikesCount</span>
+                <span class="duration"><span class="glyphicon glyphicon-time"></span>@track.Duration</span>
+            </div>
+            <div class="track-controls">
+                <button class="add-to-queue btn" onclick="@AddToQueue" title="add to queue"><span class="glyphicon glyphicon-plus-sign"></span></button>
+                <button class="remove-from-queue btn" onclick="@DeleteFromQueue" title="remove from queue"><span class="glyphicon glyphicon-minus"></span></button>
+                <button class='add-to-likes btn @(track.IsLiked? "liked":null)' onclick="@ToggleLike" title="like"><span class="glyphicon glyphicon-heart"></span></button>
+                <button class="add-to-playlist btn" onclick="@TogglePlaylists" title="add to playlist"><span class="glyphicon glyphicon-list"></span></button>
+                @if(playlist != null)
+                {
+                    <button class="del-playlistitem btn" onclick="@DeletePlaylistItem" title="remove from playlist"><span class="glyphicon glyphicon-trash"></span></button>
+                }
+            </div>
+            @if(!collapsePlaylistView && PlaylistList != null)
+            {
+                <div class="playlist-view">
+                    <h6>add to playlist</h6>
+                    <hr style="margin: 2px" />
+                    <ul>
+                        @foreach(var playlist in PlaylistList)
+                        {
+                            <li onclick="@(() => AddToPlaylist(playlist))">@playlist.Name</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@functions
+{
+    [Parameter]
+    Track track { get; set; }
+    [Parameter]
+    Playlist playlist { get; set; }
+
+    bool collapsePlaylistView = true;
+    bool isHidden = false;
+    static List<Playlist> PlaylistList;
+
+    public async void Load()
+    {
+        await Shared.Player.Load(track);
+        this.StateHasChanged();
+    }
+
+    public void AddToQueue()
+    {
+        Shared.Player.AddToQueue(track);
+    }
+
+    public void DeleteFromQueue()
+    {
+        Shared.Player.DeleteFromQueue(track);
+    }
+
+    public async Task ToggleLike()
+    {
+        var t = UrlManager.UrlEncode($"{track.Provider}:{track.ContentId}");
+        if(track.IsLiked)
+        {
+            await Http.GetAsync($"api/Likes/DeleteTracks?tracks={t}");
+        }
+        else{
+            await Http.GetAsync($"api/Likes/AddTracks?tracks={t}");
+        }
+        track.IsLiked = !track.IsLiked;
+        Pages.Likes.UpdateState();
+    }
+
+    public async Task DeletePlaylistItem()
+    {
+        if(track.rankorder >= 0)
+        {
+            playlist.Tracks.Remove(track);
+            await Http.GetAsync($"api/Playlist/DeleteTracks?token={playlist.Token}&ranks={track.rankorder}");
+            Pages.Playlists.UpdateState();
+        }
+    }
+
+    public async Task TogglePlaylists()
+    {
+        if(collapsePlaylistView)
+        {
+            PlaylistList = await Http.GetJsonAsync<List<Playlist>>("api/Playlist/GetPlaylists");
+            collapsePlaylistView = false;
+        }
+        else
+        {
+            collapsePlaylistView = true;
+        }
+
+    }
+
+    public async Task AddToPlaylist(Playlist playlist)
+    {
+        var token = playlist.Token;
+        var tracks = UrlManager.UrlEncode($"{track.Provider}:{track.ContentId}");
+        await Http.GetAsync($"api/Playlist/AddTracks?token={token}&tracks={tracks}");
+        collapsePlaylistView = true;
+    }
+}

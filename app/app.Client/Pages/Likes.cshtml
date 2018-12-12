@@ -1,0 +1,40 @@
+@page "/likes"
+@using app.Shared.Models
+@inject HttpClient Http
+
+<h1>Likes</h1>
+
+<div class='likes'>
+    <TrackList tracks=@Tracks />
+</div>
+
+@functions {
+    static List<Track> Tracks;
+    static BlazorComponent PageObject;
+
+    protected override void OnInit()
+    {
+        PageObject = this;
+    }
+
+    public static BlazorComponent GetPageObject()
+    {
+        return PageObject;
+    }
+
+    public void Update()
+    {
+        this.StateHasChanged();
+    }
+
+    public static void UpdateState()
+    {
+        Tracks = (from t in Tracks where t.IsLiked select t).ToList();
+        ((Pages.Likes)PageObject).Update();
+    }
+
+    protected override async Task OnInitAsync()
+    {
+        Tracks = await Http.GetJsonAsync<List<Track>>("api/Likes/GetTracks");
+    }
+}

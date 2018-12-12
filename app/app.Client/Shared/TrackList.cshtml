@@ -1,0 +1,25 @@
+@using app.Shared.Models
+
+<div class='track-list'>
+    <ul>
+        @if(tracks == null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            @foreach (var track in tracks)
+            {
+                <li><TrackData track=@track playlist=@playlist /></li>
+            }
+        }
+    </ul>
+</div>
+
+
+@functions {
+    [Parameter]
+    List<Track> tracks { get; set; }
+    [Parameter]
+    Playlist playlist { get; set; }
+}

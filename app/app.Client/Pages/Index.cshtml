@@ -1,0 +1,51 @@
+﻿@page "/"
+@using app.Client.Utilities
+@using app.Shared.Models
+@inject HttpClient Http
+
+<div class="search-controls">
+    <input type="text" class="form-control" bind='@query' placeholder="search" />
+    <div class="search-buttons">
+        <button class="btn btn-outline-secondary" type='button' onclick='@(() => Search("youtube"))'><i class="fa fa-youtube-play"></i>YouTube</button><button class="btn btn-outline-secondary" type='button' onclick='@(() => Search("soundcloud"))'><i class="fa fa-soundcloud"></i>SoundCloud</button>
+    </div>
+</div>
+
+<div class='search'>
+    <TrackList tracks=@Results />
+</div>
+
+@if(NextUri != null)
+{
+    <div class="search-next">
+        <button class="btn btn-outline-secondary" type='button' onclick='@LoadNext'>more</button>
+    </div>
+}
+
+@functions {
+    static List<Track> Results;
+    static string query = "";
+    static string NextUri;
+
+    public async Task Search(string provider)
+    {
+        if(query.Length > 0)
+        {
+            var q = UrlManager.UrlEncode(query);
+            var response = await Http.GetJsonAsync<SearchResult>($"api/Search/Tracks?q={q}&provider={provider}");
+            Results = response.Tracks;
+            NextUri = response.NextUri;
+            this.StateHasChanged();
+        }
+    }
+
+    public async Task LoadNext()
+    {
+        if(NextUri != null)
+        {
+            var next = UrlManager.UrlEncode(NextUri);
+            var response = await Http.GetJsonAsync<SearchResult>($"api/Search/Next?next={next}");
+            Results.AddRange(response.Tracks);
+            NextUri = response.NextUri;
+        }
+    }
+}

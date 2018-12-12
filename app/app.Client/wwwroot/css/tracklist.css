@@ -1,0 +1,74 @@
+.track-list ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+.track-container {
+    display: flex;
+    margin: 2px;
+    padding: 10px;
+    width: 100%;
+    height: 110px;
+    background-color: #eeeeee;
+}
+
+.track-container .thumbnail {
+    float: left;
+    margin-right: 10px;
+    padding: 0;
+    width: 120px;
+    height: 90px;
+    overflow: hidden;
+}
+
+.track-container .thumbnail>img {
+    width: inherit;
+    height: inherit;
+    object-fit: cover;
+}
+
+.track-container .track-info {
+    display: block;
+    overflow: hidden;
+}
+
+.track-container .track-title {
+    display: block;
+    margin: 0;
+    padding: 7px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.track-container .track-meta {
+    color: #777777;
+    padding-bottom: 10px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.track-container .track-meta>span {
+    margin-right: 2rem;
+}
+
+.track-container .track-controls>button {
+    padding: 1px;
+}
+
+.track-container .track-controls>.add-to-likes.liked {
+    color: #ff3f00;
+}
+
+.track-container .playlist-view {
+    display: block;
+    position: absolute;
+    background-color: white;
+    padding: 10px;
+    z-index: 90;
+}
+
+.remove-from-queue {
+    display: none;
+}

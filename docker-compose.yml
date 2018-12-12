@@ -1,0 +1,44 @@
+version: '3'
+services:
+  web:
+    image: nginx:1.15-alpine
+    ports:
+      - "80:80"
+    links:
+      - app
+      - loginsrv
+    volumes:
+      - ./web/default.conf:/etc/nginx/conf.d/default.conf
+
+  loginsrv:
+    image: tarent/loginsrv
+    env_file: .env
+
+  app:
+    build: ./app
+    env_file: .env
+    links:
+      - search
+      - data
+
+  search:
+    build: ./search
+    env_file: .env
+
+  data:
+    build: ./data
+    env_file: .env
+    links:
+        - db
+
+  db:
+    image: mysql:8.0
+    env_file: .env
+    ports:
+        - "3306:3306"
+    volumes:
+        - db-data:/var/lib/mysql
+        - ./db:/docker-entrypoint-initdb.d
+
+volumes:
+    db-data:

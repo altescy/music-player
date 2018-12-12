@@ -1,0 +1,45 @@
+﻿@using app.Shared
+@using app.Shared.Models
+@inject HttpClient Http
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">(و 'ω' و)</a>
+    <button class="navbar-toggler" onclick=@ToggleNavMenu>
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class=@(collapseNavMenu ? "collapse" : null) onclick=@ToggleNavMenu>
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match=NavLinkMatch.All>
+                <span class="oi oi-magnifying-glass" aria-hidden="true"></span> Search
+            </NavLink>
+        </li>
+        @if(user != null)
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="likes">
+                    <span class="oi oi-heart" aria-hidden="true"></span> Likes
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="playlists">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Playlists
+                </NavLink>
+            </li>
+        }
+    </ul>
+</div>
+
+
+@functions {
+    bool collapseNavMenu = true;
+    [Parameter]
+    User user { get; set; }
+
+    void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

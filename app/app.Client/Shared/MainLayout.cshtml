@@ -1,0 +1,44 @@
+﻿@using app.Shared
+@using app.Shared.Models
+@inject HttpClient Http
+@inherits BlazorLayoutComponent
+
+<div class="sidebar">
+    <NavMenu user=@user />
+</div>
+
+<div class="main">
+    <div class="top-row px-4">
+        <div class="login-btn">
+            @if(user == null)
+            {
+                <a href="login" target="_parent" title="login">Login</a>
+            }
+            else
+            {
+                <a href="login?logout=true" target="_parent" class="ml-md-auto" title="logout"><span class="oi oi-account-logout"></span> @user.Email</a>
+            }
+        </div>
+    </div>
+
+    <div class="row" style="margin: 0">
+        <div class="px-4 col-md-4" style="padding:0;">
+            <Player />
+        </div>
+
+        <div class="content px-4 col-md-8">
+            @Body
+        </div>
+    </div>
+</div>
+
+
+@functions {
+    User user;
+
+    protected override async Task OnInitAsync()
+    {
+        try { user = await Http.GetJsonAsync<User>("api/User/AddUser"); }
+        catch{ user = null; }
+    }
+}

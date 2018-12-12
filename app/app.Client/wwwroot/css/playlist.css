@@ -1,0 +1,24 @@
+.playlist-list ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+.playlist-list li {
+    display: block;
+    margin-bottom: 5px;
+    padding: 2px;
+}
+
+.playlist-container {
+    display: block;
+    width: 100%;
+    float: left;
+}
+
+.playlist-container .playlist-name {
+    float: left;
+}
+
+.playlist-container>.add-to-queue {
+    float: right;
+}
