@@ -5,6 +5,13 @@
 
 <h1>Playlists</h1>
 
+<div class="input-group" style="margin: 20px 0;">
+    <input type="text" class="form-control" placeholder="new playlist name" bind="@playlistName" />
+    <span class="input-group-btn">
+        <button type="button" class="btn btn-default" title="create new playlist" onclick="@CreatePlaylist">create</button>
+    </span>
+</div>
+
 <div class='playlist-list'>
     <ul>
         @if(PlaylistList == null)
@@ -17,7 +24,7 @@
             {
                 <li>
                     <div class='playlist-container'>
-                        <h4 class='playlist-name' onclick='@(() => LoadTracks(playlist))'><span class="glyphicon glyphicon-th-list"></span> @playlist.Name</h4>
+                        <h4 class='playlist-name' style="cursor : pointer;" onclick='@(() => LoadTracks(playlist))'><span class="glyphicon glyphicon-th-list"></span> @playlist.Name</h4>
                         <button class="add-to-queue btn" title="add to queue" onclick="@(() => AddToQueue(playlist))"><span class="glyphicon glyphicon-plus"></span></button>
                         <div class='playlist-tracks'>
                             @if(playlist.Tracks != null)
@@ -36,6 +43,7 @@
 @functions {
     static List<Playlist> PlaylistList;
     static BlazorComponent PageObject;
+    string playlistName;
 
     protected override void OnInit()
     {
@@ -76,5 +84,12 @@
             tracks = await Http.GetJsonAsync<List<Track>>($"api/Playlist/GetTracks?token={playlist.Token}");
         }
         Shared.Player.AddToQueue(tracks);
+    }
+
+    public async Task CreatePlaylist()
+    {
+        var name = UrlManager.UrlEncode(playlistName);
+        var playlist = await Http.GetJsonAsync<Playlist>($"api/Playlist/AddPlaylist?name={name}");
+        PlaylistList.Add(playlist);
     }
 }
