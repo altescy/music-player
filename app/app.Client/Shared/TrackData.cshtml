@@ -5,16 +5,16 @@
 @if(!isHidden)
 {
     <div class='track-container @(track.NowPlaying? "now-playing":null)'>
-        <div class="thumbnail" onclick="@Load">
+        <div class="thumbnail" style="cursor : pointer;" onclick="@Load">
             <img src="@track.ThumbnailSmall" alt="" />
         </div>
         <div class="track-info">
-            <h4 class="track-title" onclick="@Load">@track.Title</h4>
+            <h4 class="track-title" style="cursor : pointer;" onclick="@Load">@track.Title</h4>
             <div class="track-meta">
                 <span class="account-name">@track.AccountName</span>
                 <span class="playback-count"><span class="glyphicon glyphicon-play"></span>@track.PlaybackCount</span>
                 <span class="likes-count"><span class="glyphicon glyphicon-heart"></span>@track.LikesCount</span>
-                <span class="duration"><span class="glyphicon glyphicon-time"></span>@track.Duration</span>
+                <span class="duration"><span class="glyphicon glyphicon-time"></span>@GetTimeString(track.Duration)</span>
             </div>
             <div class="track-controls">
                 <button class="add-to-queue btn" onclick="@AddToQueue" title="add to queue"><span class="glyphicon glyphicon-plus-sign"></span></button>
@@ -53,6 +53,22 @@
     bool collapsePlaylistView = true;
     bool isHidden = false;
     static List<Playlist> PlaylistList;
+
+    public static string GetTimeString(int ms)
+    {
+        int h, m, s;
+        ms /= 1000;
+        h = ms / 3600;
+        m = ms % 3600 / 60;
+        s = ms % 60;
+        if(h == 0)
+        {
+            return $"{m.ToString("D2")}:{s.ToString("D2")}";
+        }
+        else{
+            return $"{h}:{m.ToString("D2")}:{s.ToString("D2")}";
+        }
+    }
 
     public async void Load()
     {
