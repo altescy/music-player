@@ -22,3 +22,7 @@
 .playlist-container>.add-to-queue {
     float: right;
 }
+
+.playlist-container>.delete-playlist {
+    float: right;
+}

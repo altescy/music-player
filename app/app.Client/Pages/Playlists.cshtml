@@ -26,6 +26,7 @@
                     <div class='playlist-container'>
                         <h4 class='playlist-name' style="cursor : pointer;" onclick='@(() => LoadTracks(playlist))'><span class="glyphicon glyphicon-th-list"></span> @playlist.Name</h4>
                         <button class="add-to-queue btn" title="add to queue" onclick="@(() => AddToQueue(playlist))"><span class="glyphicon glyphicon-plus"></span></button>
+                        <button class="delete-playlist btn" title="add to queue" onclick="@(() => DeletePlaylist(playlist))"><span class="glyphicon glyphicon-trash"></span></button>
                         <div class='playlist-tracks'>
                             @if(playlist.Tracks != null)
                             {
@@ -91,5 +92,11 @@
         var name = UrlManager.UrlEncode(playlistName);
         var playlist = await Http.GetJsonAsync<Playlist>($"api/Playlist/AddPlaylist?name={name}");
         PlaylistList.Add(playlist);
+    }
+
+    public async Task DeletePlaylist(Playlist playlist)
+    {
+        await Http.GetAsync($"api/Playlist/DeletePlaylist?token={playlist.Token}");
+        PlaylistList.Remove(playlist);
     }
 }

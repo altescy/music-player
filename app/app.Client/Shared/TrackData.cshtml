@@ -34,7 +34,7 @@
                     <ul>
                         @foreach(var playlist in PlaylistList)
                         {
-                            <li onclick="@(() => AddToPlaylist(playlist))">@playlist.Name</li>
+                            <li style="cursor : pointer;" onclick="@(() => AddToPlaylist(playlist))">@playlist.Name</li>
                         }
                     </ul>
                 </div>
